@@ -3,7 +3,8 @@
 #Collaborators - 
 #AI Use - used ChatGPT for these fixes - 1. helped explain errors with 
 # loading my csv file and recommended adding function to handle errors when 
-# converting to float 2. used it to help generate test cases
+# converting to float 2. used it to help generate test cases 3. used it to help with smaller helper functions
+#specifically the function checkers which handle messy data
 
 import csv
 import unittest
@@ -20,7 +21,7 @@ def load_csv_file(f):
         #create function to deal with csv numbers
         def try_float(value):
             try:
-                value = float(value)
+                return float(value)
             except:
                 return 'NA'
         for row in csv_file:
@@ -37,9 +38,58 @@ def load_csv_file(f):
             new_dict['Sex'] = new_row[6]
             new_dict['Year'] = new_row[7]
             info.append(new_dict)
-        print(info)
+        #print(info)
         return info
 
+def body_mass_valid_row(row_info):
+    check = ['Body Mass', 'Sex', 'Year']
+    for item in check:
+        if row_info.get(item)  in [" ", "NA", None]: #or row_info[item]
+            return False
+    return True
+   
+
+
+def calculate_mass(file_info):
+    mass_dict = {}
+    for row in file_info:
+        if not body_mass_valid_row(row): #skip rows that have issues with data
+            continue
+        species = row['Species']
+        year = row['Year']
+        mass = row['Body Mass']
+
+        if species not in mass_dict:
+            mass_dict[species] = {}
+        if year not in mass_dict[species]:
+            mass_dict[species][year] = []
+
+        mass_dict[species][year].append(mass)
+    #print(mass_dict)
+    return mass_dict
+            
+def calculate_avg(nested_dict):
+    avg_dict = {}
+
+    for out_keys, inner_dict in nested_dict.items():
+        avg_dict[out_keys] = {}
+        for inner_keys, inner_values in inner_dict.items():
+            if len(inner_values)>0:
+                avg = sum(inner_values)/len(inner_values)
+                avg_dict[out_keys][inner_keys] = round(avg,2)
+            else:
+                avg_dict[out_keys][inner_keys] = None
+    return avg_dict
+
+def calculate_body_mass_by_species_and_year(file_info):
+    body_mass_dict = calculate_mass(file_info)
+    mass_avg_dict = calculate_avg(body_mass_dict)
+    print(mass_avg_dict)
+    return mass_avg_dict                
+
+
+penguin_info = load_csv_file('penguins.csv')
+calculate_body_mass_by_species_and_year(penguin_info)
 
 """class TestAllMethod(unittest.TestCase):
     def setUp(self):
@@ -131,10 +181,6 @@ def load_csv_file(f):
 #come back and double check code when fiinished with functions
 #edit/replace function names
 """""
-
-load_csv_file('penguins.csv')
-
-
 
 
 #def main():
