@@ -1,5 +1,6 @@
 #Name - Kerrington Jackson
 #UMID - 75922020
+#email - kerryjac@umich.edu
 #Collaborators - 
 #AI Use - used ChatGPT for these fixes - 1. helped explain errors with 
 # loading my csv file and recommended adding function to handle errors when 
@@ -42,7 +43,7 @@ def load_csv_file(f):
         return info
 
 def body_mass_valid_row(row_info):
-    check = ['Body Mass', 'Sex', 'Year']
+    check = ['Body Mass', 'Species', 'Year']
     for item in check:
         if row_info.get(item)  in [" ", "NA", None]: #or row_info[item]
             return False
@@ -87,11 +88,51 @@ def calculate_body_mass_by_species_and_year(file_info):
     print(mass_avg_dict)
     return mass_avg_dict                
 
+def bill_length_valid_row(row_info):
+    check = ['Bill Length', 'Sex', 'Island']
+    for item in check:
+        if row_info.get(item)  in [" ", "NA", None]:
+            return False
+    return True
+
+def create_bill_len_dict(file_info, threshold):
+    bill_len_dict = {}
+    percent_dict = {}
+    for row in file_info:
+        if not bill_length_valid_row(row):
+            continue
+
+        island = row['Island']
+        sex = row['Sex']
+        bill_len = row['Bill Length']
+
+        if island not in bill_len_dict:
+            bill_len_dict[island] = {}
+        if sex not in bill_len_dict[island]:
+            bill_len_dict[island][sex] = {'valid': 0, 'total': 0}
+
+        bill_len_dict[island][sex]['total'] += 1
+
+        if bill_len>threshold:
+            bill_len_dict[island][sex]['valid'] += 1
+
+    for islands, sexes in bill_len_dict.items():
+        percent_dict[islands] = {}
+        for keys, values in sexes.items():
+            if values['total']>0:
+                percent = (values['valid']/values['total']) * 100
+            else:
+                percent = 0
+            percent_dict[islands][keys] = f"{percent:.2f}%"
+    print(percent_dict)
+    return percent_dict
+        
 
 penguin_info = load_csv_file('penguins.csv')
 calculate_body_mass_by_species_and_year(penguin_info)
+create_bill_len_dict(penguin_info, 40)
 
-"""class TestAllMethod(unittest.TestCase):
+class TestAllMethod(unittest.TestCase):
     def setUp(self):
         self.penguin_info = load_csv_file('penguins.csv')
 
@@ -102,7 +143,7 @@ calculate_body_mass_by_species_and_year(penguin_info)
             {'species': 'Adelie', 'body_mass_g': 3250.0, 'year': 2007},
         ]
         expected = {('Adelie', 2007): 3600.0}
-        result = avg_body_mass_species_year(input_data)
+        result = calculate_body_mass_by_species_and_year(input_data)
         self.assertEqual(result, expected)
 
 
@@ -112,7 +153,7 @@ calculate_body_mass_by_species_and_year(penguin_info)
             {'species': 'Gentoo', 'body_mass_g': 5000.0, 'year': 2009},
         ]
         expected = {('Adelie', 2007): 3600.0, ('Gentoo', 2009): 5000.0}
-        result = avg_body_mass_species_year(input_data)
+        result = calculate_body_mass_by_species_and_year(input_data)
         self.assertEqual(result, expected)
 
     def test_body_mass_edge1(self):
@@ -121,7 +162,7 @@ calculate_body_mass_by_species_and_year(penguin_info)
             {'species': 'Adelie', 'body_mass_g': 3700.0, 'year': 2007},
         ]
         expected = {('Adelie', 2007): 3700.0}
-        result = avg_body_mass_species_year(input_data)
+        result = calculate_body_mass_by_species_and_year(input_data)
         self.assertEqual(result, expected)
     
     def test_body_mass_edge2(self):
@@ -129,7 +170,7 @@ calculate_body_mass_by_species_and_year(penguin_info)
             {'species': 'Chinstrap', 'body_mass_g': 3750.0, 'year': 2008},
         ]
         expected = {('Chinstrap', 2008): 3750.0}
-        result = avg_body_mass_species_year(input_data)
+        result = calculate_body_mass_by_species_and_year(input_data)
         self.assertEqual(result, expected)
     
     def test_flipper_length_gen1(self):
