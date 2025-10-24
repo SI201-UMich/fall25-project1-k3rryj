@@ -22,13 +22,8 @@ def load_csv_file(f):
     with open(full_path) as fh:
         csv_file = csv.reader(fh)
         headers = next(csv_file)
-        info = []
-        #create function to deal with csv numbers
-        def try_float(value):
-            try:
-                return float(value)
-            except:
-                return "NA"
+        file_info = []
+        
         for row in csv_file:
             new_dict = {}
             new_row = row[1:] #get rid of row number
@@ -42,9 +37,16 @@ def load_csv_file(f):
             new_dict['Body Mass'] = try_float(new_row[5])
             new_dict['Sex'] = new_row[6]
             new_dict['Year'] = new_row[7]
-            info.append(new_dict)
-        return info
+            file_info.append(new_dict)
+        return file_info
 
+#create function to deal with csv numbers    
+def try_float(value):
+            try:
+                return float(value)
+            except:
+                return "NA"
+            
 def body_mass_valid_row(row_info):
     check = ['Body Mass', 'Species', 'Year']
     for item in check:
