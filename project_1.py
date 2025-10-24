@@ -3,13 +3,15 @@
 #UMID - 75922020
 #email - kerryjac@umich.edu
 #Collaborators - GenAI
+#I wrote all the functions
 #AI Use - used ChatGPT for these fixes - 1. helped explain errors with 
 # loading my csv file and recommended adding function to handle errors when 
 # converting to float 2. used it to help generate test cases but edited them
 # to make sure they matched my actual sample data 3. used it to 
 # help with smaller helper functions specifically the function checkers which 
-# handle messy data #had it recommend minor fixes too impove functions - added strip() and upper() to check for na/none to
-#cover more cases 4. used it to help fix my mistakes when writing my output function
+# handle messy data #had it recommend minor fixes to impove functions - added strip() and upper() to check for na/none to
+#cover more cases 4. used it to help fix my mistakes when writing my output function to the csv file, reminded me to add brackets
+#for writing the rows
 
 import csv
 import unittest
@@ -50,7 +52,7 @@ def try_float(value):
 def body_mass_valid_row(row_info):
     check = ['Body Mass', 'Species', 'Year']
     for item in check:
-        if str(row_info.get(item)).strip().upper()  in [" ", "NA", None, "NONE", ""]: #or row_info[item]
+        if str(row_info.get(item)).strip().upper()  in [" ", "NA", None, "NONE", ""]: 
             return False
     return True
    
@@ -97,7 +99,7 @@ def calculate_body_mass_by_species_and_year(file_info):
 def bill_length_valid_row(row_info):
     check = ['Bill Length', 'Sex', 'Island']
     for item in check:
-        if str(row_info.get(item)).strip().upper()  in [" ", "NA", None, "NONE", ""]:
+        if str(row_info.get(item)).strip().upper()  in [" ", "NA", None, "NONE", ""]: #cover possible cases
             return False
     return True
 
